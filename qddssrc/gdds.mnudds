@@ -1,0 +1,50 @@
+     A* Menu de format libre : GDDS
+     A*%%TS  SD  20260622  135913  PLB         REL-V7R6M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3                  -
+     A                                             27 132 *DS4)
+     A                                      CHGINPDFT
+     A                                      INDARA
+     A                                      PRINT(*LIBL/QSYSPRT)
+     A          R GDDS
+     A*%%TS  SD  20260622  135913  PLB         REL-V7R6M0  5770-WDS
+     A                                      DSPMOD(*DS3)
+     A                                      LOCK
+     A                                      SLNO(01)
+     A                                      CLRL(*ALL)
+     A                                      ALWROL
+     A                                      CF03
+     A                                      HELP
+     A                                      HOME
+     A                                      HLPRTN
+     A                                  1  2'GDDS'
+     A                                      COLOR(BLU)
+     A                                  1 34'Menu Pour GDDS'
+     A                                      DSPATR(HI)
+     A                                  3  2'Choisir une des options suivantes -
+     A                                      :'
+     A                                      COLOR(BLU)
+     A                                  6  7'1. Affichage des logs (DSPLOGDDS)'
+     A                                  7  7'2. Ajout instruction à un source (-
+     A                                      ADDDDSINS)'
+     A                                  8  7'3. Retrait instruction(s) à un sou-
+     A                                      rce (RMVDDSINS)'
+     A                                 13  6'21. Paramétrage de GDDS (GPARAMGDD-
+     A                                      S)'
+     A                                 15  6'23.'
+     A* CMDPROMPT  Ne pas supprimer cette spécification DDS.
+     A                                019  2'Option ou commande                -
+     A                                          '
+     A                                 15 10'Gestion paramétrage GDDS (WRKENVDD-
+     A                                      S)'
+     A                                 16  6'24. Epuration Log GDDS (EPULOGDDS)'
+     A                                  9  7'4. Affichage des instructions d''u-
+     A                                      n source (DSPDDSINS)'
+     A                                 14  6'22. Paramétrage des commandes GDDS-
+     A                                       (ADDENVGDDS)'
+     A                                 12  5'Paramétrage -----------------------
+     A                                      ----------------------------'
+     A                                  5  5'Utilisation -----------------------
+     A                                      ----------------------------'
+     A                                 10  7'5. Remplacement instruction d''un -
+     A                                      source (RPLDDSINS) '

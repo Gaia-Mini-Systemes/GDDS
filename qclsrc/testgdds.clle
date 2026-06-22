@@ -1,0 +1,5 @@
+pgm
+/* <COMP>TGTRLS(V7R4M0)</COMP> */
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('hellow  +
+                          Wolrd.') MSGTYPE(*INFO)
+endpgm

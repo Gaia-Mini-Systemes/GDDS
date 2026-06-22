@@ -1,0 +1,12 @@
+     A*%%TS  SD  20260613  121143  PLB         REL-V7R6M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(27 132 *DS4)
+     A                                      CA03(03)
+     A                                      INDARA
+     A* Format détail des zones
+     A          R FMT02
+     A*%%TS  SD  20260613  121143  PLB         REL-V7R6M0  5770-WDS
+     A                                      CA12(12)
+     A                                  4  3'Test bidon'
+     A* <<<< AJOUT GDDS >>>>
+     A*<COMP>RSTDSP(*YES)</COMP>

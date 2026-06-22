@@ -1,0 +1,64 @@
+PGM (&LIBSRC &FICSRC &MBRSRC &OLDCHAR &NEWCHAR)
+/* Ce programme sert à ajouter une directive ce compile à un */
+/* membre source pour qu'il soit pris compte par GDDS */
+/* <COMP> </COMP> */
+/* Elle sera ajoutée à la fin du membre source */
+DCL &LIBSRC *CHAR 10
+DCL &FICSRC *CHAR 10
+DCL &MBRSRC *CHAR 10
+DCL &OLDCHAR *CHAR 60  /* instruction avant     */
+DCL &NEWCHAR *CHAR 60  /* instruction après     */
+/* */
+dcl &cmdsql *char 512
+if cond(%parms < 4) then(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Vous +
+                          devez indiquer 5 paramètres, +
+                          Bibliothèque, fichier, membre et +
+                          instruction avant et après') MSGTYPE(*ESCAPE)
+enddo
+chkobj &libsrc         *Lib
+monmsg cpf9801 exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Bibliothéque non +
+                          trouvée') MSGTYPE(*ESCAPE)
+enddo
+             CHKOBJ     OBJ(&LIBSRC/&FICSRC) OBJTYPE(*FILE) +
+                          MBR(&mbrsrc)
+monmsg cpf9801 exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Fichier non +
+                          trouvé') MSGTYPE(*ESCAPE)
+enddo
+monmsg cpf9815 exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Membre non +
+                          trouvé') MSGTYPE(*ESCAPE)
+enddo
+/* si pas d'instruction */
+             IF         COND(&OLDCHAR = '<COMP>BEFORE</COMP>') THEN(DO)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Vous +
+                          devez entrer une instruction ') +
+                          MSGTYPE(*ESCAPE)
+                          enddo
+/* */
+             CHGVAR     VAR(&CMDSQL) VALUE('DROP ALIAS QTEMP/INPUT')
+             RUNSQL     SQL(&CMDSQL) COMMIT(*NONE)
+             MONMSG     MSGID(SQL0000)
+             CHGVAR     VAR(&CMDSQL) VALUE('CREATE ALIAS QTEMP/INPUT +
+                          FOR ' *CAT &LIBSRC *TCAT '/' *TCAT +
+                          &FICSRC *TCAT ' (' *TCAT &MBRSRC *TCAT ')')
+             RUNSQL     SQL(&CMDSQL) COMMIT(*NONE)
+             MONMSG     MSGID(SQL0000)
+             CHGVAR     VAR(&CMDSQL) VALUE('UPDATE QTEMP/INPUT SET +
+                          SRCDTA = REPLACE(SRCDTA, ''' *TCAT +
+                          &OLDCHAR *TCAT ''', ''' *CAT &NEWCHAR +
+                          *TCAT ''')')
+/* Ajout commentaire */
+             RUNSQL     SQL(&CMDSQL) COMMIT(*NONE)
+             MONMSG     MSGID(SQL0000) exec(Do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Fichier +
+                          non mis à jour') MSGTYPE(*ESCAPE)
+enddo
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                         MSGDTA('Instruction remplacée') MSGTYPE(*COMP)
+endpgm

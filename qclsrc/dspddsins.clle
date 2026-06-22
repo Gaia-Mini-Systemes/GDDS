@@ -1,0 +1,69 @@
+PGM (&LIBSRC &FICSRC &MBRSRC &dsp)
+/* ce programme sert à voir les directive ce compile GDDS */
+/* dans un membre source  */
+/* il génère un fichier dans qtemp lstinst                */
+/* en interactif vous pouver voir ce fichier en direct    */
+DCL &LIBSRC *CHAR 10
+DCL &FICSRC *CHAR 10
+DCL &MBRSRC *CHAR 10
+DCL &dsp    *CHAR 04 /* afficher ne 5250 *YES ou *NO      */
+/* */
+dcl &cmdsql *char 512
+if cond(%parms < 3) then(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Vous +
+                          devez indiquer 3 paramètres, Bibliothèque, +
+                          fichier, membre ')   +
+                          MSGTYPE(*ESCAPE)
+enddo
+chkobj &libsrc         *Lib
+monmsg cpf9801 exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Bibliothéque non +
+                          trouvée') MSGTYPE(*ESCAPE)
+enddo
+             CHKOBJ     OBJ(&LIBSRC/&FICSRC) OBJTYPE(*FILE) +
+                          MBR(&mbrsrc)
+monmsg cpf9801 exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Fichier non +
+                          trouvée') MSGTYPE(*ESCAPE)
+enddo
+monmsg cpf9815 exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Membre non +
+                          trouvée') MSGTYPE(*ESCAPE)
+enddo
+/* creation alias */
+             CHGVAR     VAR(&CMDSQL) VALUE('DROP ALIAS QTEMP/INPUT')
+             RUNSQL     SQL(&CMDSQL) COMMIT(*NONE)
+             MONMSG     MSGID(SQL0000)
+             CHGVAR     VAR(&CMDSQL) VALUE('DROP TABLE QTEMP/LSTINST')
+             RUNSQL     SQL(&CMDSQL) COMMIT(*NONE)
+             MONMSG     MSGID(SQL0000)
+             CHGVAR     VAR(&CMDSQL) VALUE('CREATE ALIAS QTEMP/INPUT +
+                          FOR ' *CAT &LIBSRC *TCAT '/' *TCAT +
+                          &FICSRC *TCAT ' (' *TCAT &MBRSRC *TCAT ')')
+             RUNSQL     SQL(&CMDSQL) COMMIT(*NONE)
+             MONMSG     MSGID(SQL0000)
+/* affichage  directive plus commentaire */
+             CHGVAR     VAR(&CMDSQL) VALUE('Create table +
+                          qtemp/lstinST as(SELECT * FROM QTEMP/INPUT +
+                          WHERE ((srcdta like(''%<COMP>%'') and +
+                          srcdta like(''%</COMP>%'')) or ( srcdta +
+                          like(''%GDDS%'')))) with data')
+             RUNSQL     SQL(&CMDSQL) COMMIT(*NONE)
+             MONMSG     MSGID(SQL0000) exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Erreur de génération') +
+                                    MSGTYPE(*ESCAPE)
+enddo
+/* Affichage 5250 */
+             IF         COND(&DSP = '*YES') THEN(DO)
+             CALL       PGM(DSPDDSINSR) PARM((&LIBSRC) (&FICSRC) +
+                          (&MBRSRC))
+             ENDDO
+/* Fin de traitement */
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Fichier lstinst généré') +
+                          MSGTYPE(*COMP)
+endpgm

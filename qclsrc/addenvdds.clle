@@ -1,0 +1,112 @@
+PGM parm(&libpgm &libcmd &pgmin  &crtdspf &crtprtf &crtpf &crtlf)
+/*---------------------------------------------------------*/
+/*                                                         */
+/* Compiler votre programme                                */
+/*                                                         */
+/* et associe le programme d'exit à votre programme        */
+/*                                                         */
+/* Le Programme GDDS doit exister dans la bibliothèque     */
+/*---------------------------------------------------------*/
+dcl &libpgm *char 10 /* bibliothèque du programme gdds       */
+dcl &libcmd *char 10 /* bibliothèque de la commande exp QSYS */
+dcl &pgmin  *char 02 /* Valeur premier numéro de programme   */
+dcl &crtdspf *char 1
+dcl &crtprtf *char 1
+dcl &crtpf   *char 1
+dcl &crtlf   *char 1
+/* declaration variable preformatée */
+             DCL        VAR(&exCMD) TYPE(*CHAR) LEN(512) +
+                          VALUE('ADDEXITPGM +
+                          EXITPNT(QIBM_QCA_CHG_COMMAND) +
+                          FORMAT(CHGC0100) PGMNBR(92) +
+                          PGM(')
+dcl &cmd    *char 10 /* commande à intercepter               */
+dcl &pgmind *dec  02
+DCL &LEN *DEC (15 5)
+dclf gparamgdds
+/* lecture paramétrage */
+rcvf
+monmsg cpf0864 exec(do)
+chgvar &libprd 'GDDSD'
+chgvar &pgmrob 'GDDSROBOT'
+chgvar &bibrob 'GDDSD'
+chgvar &bibcmd 'QSYS'
+enddo
+/* Controles  des paramètres */
+if cond(%parms < 7) then(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Vous +
+                          devez indiquer 7 paramètres Bibliothèque +
+                          commande et bibliothèque pgm , port +
+                          initial et commandes à traiter') +
+                          MSGTYPE(*ESCAPE)
+enddo
+if cond(&libpgm = '*PARAM') then(do)
+chgvar &libpgm &bibrob
+enddo
+chkobj &libpgm         *Lib
+monmsg cpf9801 exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Bibliothéque programme non +
+                          trouvée') MSGTYPE(*ESCAPE)
+enddo
+chkobj &libpgm/&pgmrob *PGM
+monmsg cpf9801 exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Programme ROBOTGDDS non trouvé') +
+                          MSGTYPE(*ESCAPE)
+enddo
+if cond(&libcmd = '*PARAM') then(do)
+chgvar &libcmd &bibcmd
+enddo
+chkobj &libcmd         *Lib
+monmsg cpf9801 exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Bibliothéque commande  non +
+                          trouvée') MSGTYPE(*ESCAPE)
+enddo
+/*-------------------------------------------*/
+/* Mise en Oeuvre sur les commandes choisies */
+/*-------------------------------------------*/
+if cond(&crtdspf = 'O') then(do)
+chgvar &cmd   'CRTDSPF'
+CALLSUBR SUBR(ADDEXIT)
+enddo
+if cond(&crtprtf= 'O') then(do)
+chgvar &cmd   'CRTPRTF'
+CALLSUBR SUBR(ADDEXIT)
+enddo
+if cond(&crtpf = 'O') then(do)
+chgvar &cmd   'CRTPF'
+CALLSUBR SUBR(ADDEXIT)
+enddo
+if cond(&crtlf = 'O') then(do)
+chgvar &cmd   'CRTLF'
+CALLSUBR SUBR(ADDEXIT)
+enddo
+/*------------------------------------------------------------*/
+/* Sous programme ajout du programme d'exit                   */
+/*------------------------------------------------------------*/
+SUBR SUBR(ADDEXIT)
+/* mis à jour du numero de programme */
+chgvar %sst(&excmd 66 2)  &pgmin
+             CHGVAR     VAR(&EXCMD) VALUE(&EXCMD *TCAT &LIBPGM *TCAT +
+                          '/' *tCAT &PGMROB *TCAT ') PGMDTA(*JOB 20 +
+                          ''' *CAT &CMD *CAT &LIBCMD *CAT ''')')
+chgvar &len %LEN(&EXCMD)
+CALL QCMDEXC (&EXCMD &LEN)
+monmsg cpf0000 exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Ajout +
+                          exit PGM pour' *BCAT &CMD *BCAT +
+                          'impossible, regardez la log.') +
+                          MSGTYPE(*ESCAPE)
+enddo
+/* Fin normale */
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Ajout +
+                          exit PGM pour' *BCAT &CMD *BCAT +
+                          'effectué') MSGTYPE(*INFO)
+/* avancement du compteur */
+chgvar &pgmind &pgmin
+chgvar &pgmind (&pgmind + 1)
+chgvar &pgmin  &pgmind
+ENDSUBR
+ENDPGM

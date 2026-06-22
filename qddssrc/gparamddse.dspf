@@ -1,0 +1,36 @@
+     A*%%TS  SD  20260621  171950  PLB         REL-V7R6M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/GPARAMGDDS GPARAMGDDS)
+     A                                      CA03(03)
+     A          R FMT01
+     A*%%TS  SD  20260621  171950  PLB         REL-V7R6M0  5770-WDS
+     A                                      CF10(10)
+     A                                      CA12(12)
+     A                                  1 71DATE
+     A                                      EDTCDE(Y)
+     A                                  1 22'Paramétrage Applicatif'
+     A                                      DSPATR(HI)
+     A            GLOG          10A  O  1 45DSPATR(HI)
+     A                                  1  2USER
+     A                                  2 71TIME
+     A                                  2  2SYSNAME
+     A                                  8  2'Bibliothèque Produit ......:'
+     A                                      DSPATR(HI)
+     A*
+     A                                 23  3'F3/F12=Re      F10=Valider'
+     A                                      COLOR(BLU)
+     A                                  9  2'Programme Robot ...........:'
+     A                                      DSPATR(HI)
+     A                                 10  2'Bibliothèque du programme .:'
+     A                                      DSPATR(HI)
+     A                                 11  2'Bibliothèque commandes.....:'
+     A                                      DSPATR(HI)
+     A            LIBPRD    R        B  8 31
+     A            PGMROB    R        B  9 31
+     A            BIBROB    R        B 10 31
+     A            BIBCMD    R        B 11 31
+     A                                  8 42'(Par Défaut GDDSD)'
+     A                                 10 42'(Par Défaut GDDSD)'
+     A                                  9 42'(Par Défaut GDDSROBOT)'
+     A                                 11 42'(Par Défaut QSYS)'

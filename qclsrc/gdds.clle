@@ -1,0 +1,8 @@
+pgm
+/* Lancement Meni gdds         */
+go gdds
+monmsg CPF6A00 exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Le menu +
+                          GDDS n''est pas accessible') MSGTYPE(*ESCAPE)
+enddo
+endpgm

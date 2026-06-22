@@ -1,0 +1,75 @@
+PGM (&LIBSRC &FICSRC &MBRSRC &INSTRU)
+/* Ce programme sert à ajouter une directive ce compile à un */
+/* membre source pour qu'il soit pris compte par GDDS */
+/* <COMP> </COMP> */
+/* Elle sera ajoutée à la fin du membre source */
+DCL &LIBSRC *CHAR 10
+DCL &FICSRC *CHAR 10
+DCL &MBRSRC *CHAR 10
+DCL &INSTRU *CHAR 60  /* instruction à ajouter */
+/* */
+dcl &cmdsql *char 512
+if cond(%parms < 4) then(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Vous +
+                          devez indiquer 4 paramètres, Bibliothèque, +
+                          fichier, membre et instruction')   +
+                          MSGTYPE(*ESCAPE)
+enddo
+chkobj &libsrc         *Lib
+monmsg cpf9801 exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Bibliothéque non +
+                          trouvée') MSGTYPE(*ESCAPE)
+enddo
+             CHKOBJ     OBJ(&LIBSRC/&FICSRC) OBJTYPE(*FILE) +
+                          MBR(&mbrsrc)
+monmsg cpf9801 exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Fichier non +
+                          trouvée') MSGTYPE(*ESCAPE)
+enddo
+monmsg cpf9815 exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Membre non +
+                          trouvée') MSGTYPE(*ESCAPE)
+enddo
+/* si pas d'instruction */
+             IF         COND(&INSTRU = '<COMP></COMP>') THEN(DO)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Vous +
+                          devez entrer une instruction ') +
+                          MSGTYPE(*ESCAPE)
+enddo
+/* si instruction mauvaise */
+        IF         COND(%sst(&INSTRU  1  6) *ne '<COMP>') THEN(DO)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Vous +
+                          devez entrer une instruction au format +
+                          <COMP> </COMP>') MSGTYPE(*ESCAPE)
+enddo
+             CHGVAR     VAR(&CMDSQL) VALUE('DROP ALIAS QTEMP/INPUT')
+             RUNSQL     SQL(&CMDSQL) COMMIT(*NONE)
+             MONMSG     MSGID(SQL0000)
+             CHGVAR     VAR(&CMDSQL) VALUE('CREATE ALIAS QTEMP/INPUT +
+                          FOR ' *CAT &LIBSRC *TCAT '/' *TCAT +
+                          &FICSRC *TCAT ' (' *TCAT &MBRSRC *TCAT ')')
+             RUNSQL     SQL(&CMDSQL) COMMIT(*NONE)
+             MONMSG     MSGID(SQL0000)
+/* ajout commentaire */
+             CHGVAR     VAR(&CMDSQL) VALUE('INSERT INTO QTEMP/INPUT +
+                          VALUES(8888, 010101, ''     A* <<<< AJOUT +
+                          GDDS >>>>'')')
+             RUNSQL     SQL(&CMDSQL) COMMIT(*NONE)
+             MONMSG     MSGID(SQL0000)
+/* mise en commentaire instruction   */
+             CHGVAR     VAR(&INSTRU) VALUE('     A*' *TCAT &INSTRU)
+             CHGVAR     VAR(&CMDSQL) VALUE('INSERT INTO QTEMP/INPUT +
+                          VALUES(8888, 010101, ''' *TCAT &INSTRU +
+                          *TCAT ''')')
+             RUNSQL     SQL(&CMDSQL) COMMIT(*NONE)
+             MONMSG     MSGID(SQL0000) exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Ajout instruction impossible') +
+                                    MSGTYPE(*ESCAPE)
+enddo
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Instruction ajoutée') MSGTYPE(*COMP)
+endpgm

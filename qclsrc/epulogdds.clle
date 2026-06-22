@@ -1,0 +1,26 @@
+pgm &P_nbjour
+/* programme d'epuration des log gdds */
+/* de 001 à 999 jours */
+dcl &p_nbjour *char 3
+dcl &w_nbjour *char 3
+dcl &cmdsql *char 512
+if (%parms() < 1) then(do)
+chgvar &w_nbjour  '060'
+enddo
+else do
+chgvar &w_nbjour  &p_nbjour
+enddo
+/* parametrage de la commande */
+             CHGVAR     VAR(&CMDSQL) VALUE('delete FROM LOGGDDS +
+                          WHERE LOGDATE <= current date -' *BCAT +
+                          &W_NBJOUR *BCAT 'days')
+             RUNSQL     SQL(&CMDSQL) COMMIT(*NONE)
+             MONMSG     MSGID(SQL0000) exec(do)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Epuration Log GDDS impossible') +
+                                    MSGTYPE(*ESCAPE)
+enddo
+/* Fin de traitement */
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                          MSGDTA('Epuration Log GDDS effectuée') +
+                          MSGTYPE(*COMP)

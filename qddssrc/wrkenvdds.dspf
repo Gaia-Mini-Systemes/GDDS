@@ -1,0 +1,91 @@
+     A*%%TS  SD  20260621  172244  PLB         REL-V7R6M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(27 132 *DS4)
+     A                                      CA03(03)
+     A                                      INDARA
+     A* Format détail des zones
+     A          R FMT02
+     A*%%TS  SD  20260621  172244  PLB         REL-V7R6M0  5770-WDS
+     A                                      CA12(12)
+     A            EXIT_NBR       5S 0B  7 17
+     A  64                                  DSPATR(PR)
+     A            EXIT_LIB      10A  B  8 17
+     A  64                                  DSPATR(PR)
+     A            EXIT_PGM      10A  B  9 17
+     A  64                                  DSPATR(PR)
+     A                                  1 48'Détail commande GDDS'
+     A                                      DSPATR(HI)
+     A                                  4 17'QIBM_QCA_CHG_COMMAND'
+     A                                      DSPATR(HI)
+     A                                  7  2'Numéro.......:'
+     A                                  8  2'Bibliothèque.:'
+     A                                  9  2'Programme....:'
+     A                                 10  2'Commande.....:'
+     A                                 26  3'F12=Retour'
+     A                                      COLOR(BLU)
+     A                                  4  2'Nom du point.:'
+     A                                  5  2'Format.......:'
+     A            EXIT_FMT       8A  O  5 17
+     A            EXIT_CMD      10A  B 10 17
+     A  64                                  DSPATR(PR)
+     A                                 11  2'Bibliothèque.:'
+     A            EXIT_LIBC     10A  B 11 17
+     A  64                                  DSPATR(PR)
+     A                                  7 29'(Numéro de programme, doit être un-
+     A                                      ique)'
+     A                                  8 29'(Bibliothèque du programme de trai-
+     A                                      tement)'
+     A                                  9 29'(Prograemme de traitement)'
+     A                                 10 29'(Commande à traiter)'
+     A                                 11 29'(Bibliothèque de la commande à tra-
+     A                                      iter)'
+     A                                  5 29'(CHGC0100 par défaut)'
+     A* Format Sous Fichier  des zones
+     A          R SFL01                     SFL
+     A*%%TS  SD  20260613  131217  PLB         REL-V7R6M0  5770-WDS
+     A            OPT01          1A  B  6  2VALUES(' ' '4' '5')
+     A                                      TEXT('Option du SFL')
+     A            RANG          15S 0H
+     A            EXIT_NBR       5S 0O  6  5
+     A            EXIT_LIB      10A  O  6 12
+     A            EXIT_PGM      10A  O  6 24
+     A            EXIT_CMDW     35A  O  6 36
+     A            EXIT_FMT       8   O  6 73
+     A* Format de controle du Sous Fichier
+     A          R CTL01                     SFLCTL(SFL01)
+     A*%%TS  SD  20260613  155116  PLB         REL-V7R6M0  5770-WDS
+     A                                      SFLSIZ(0020)
+     A                                      SFLPAG(0019)
+     A                                      CF05(05)
+     A                                      CF06(06)
+     A                                      OVERLAY
+     A  42                                  SFLDSP
+     A  41                                  SFLDSPCTL
+     A  40                                  SFLCLR
+     A  43                                  SFLEND(*MORE)
+     A            NUM01          4S 0H      SFLRCDNBR(CURSOR)
+     A                                      TEXT('Zone SFLRCDNBR')
+     A            NOM_DU_PGM    10A  O  1  2
+     A                                  1 48'Paramétrage des commandes GDDS'
+     A                                      DSPATR(HI)
+     A                                  1 99'Nombre de commandes :'
+     A            NB_ENR         6Y 0O  1121EDTCDE(Z)
+     A                                      DSPATR(HI)
+     A                                  2 17'QIBM_QCA_CHG_COMMAND'
+     A                                      DSPATR(HI)
+     A                                  4  3'4=Supprimer'
+     A                                      COLOR(BLU)
+     A                                  5  2'   Numéro Biblio      Programme   -
+     A                                      Commande interceptée               -
+     A                                        Format'
+     A                                      DSPATR(HI)
+     A            RANG          15S 0H
+     A                                  2  2'Nom du point.:'
+     A                                  4 15'5=Afficher'
+     A                                      COLOR(BLU)
+     A* Format de bas de page du Sous Fichier
+     A          R FMT01
+     A*%%TS  SD  20260613  132812  PLB         REL-V7R6M0  5770-WDS
+     A                                 26  3'F3=Quitter F5=Réafficher F6=Ajoute-
+     A                                      r'
+     A                                      COLOR(BLU)
