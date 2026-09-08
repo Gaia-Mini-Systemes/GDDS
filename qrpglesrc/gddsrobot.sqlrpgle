@@ -73,9 +73,18 @@ init_pgm();
 // Récupération de la commande recue à traiter
 Param1 = PParam1;
 Format_String  =  %subst(Param1 : (Offset + 1) : Command_length);
-// On execute toujours la commande de QSYS */
+
+// Traitement de l'invite F4
+if %subst(Format_String:1:2) ='? ';
+  // On execute toujours la commande de QSYS */
+  Format_String  = %subst(Format_String:1:2) + 'QSYS/' +
+                   %subst(Format_String:3);
+else;
+  // On execute toujours la commande de QSYS */
   Format_String  = 'QSYS/' + Format_String;
-// Récupération de la bibliothèque, du fihhier et du membre source
+endif;
+
+// Récupération de la bibliothèque, du fichier et du membre source
 RTVMBRSRC(Format_String : P_Lib : P_Fil : P_Mbr);
 // Si *CURLIB
 If P_Lib = '*CURLIB';
