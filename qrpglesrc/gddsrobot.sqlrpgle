@@ -74,19 +74,24 @@ init_pgm();
 Param1 = PParam1;
 Format_String  =  %subst(Param1 : (Offset + 1) : Command_length);
 
-// Traitement de l'invite F4
-if %subst(Format_String:1:2) ='? ';
-  // On execute toujours la commande de QSYS */
-  Format_String  = %subst(Format_String:1:2) + 'QSYS/' +
-                   %subst(Format_String:3);
-else;
-  // On execute toujours la commande de QSYS */
-  Format_String  = 'QSYS/' + Format_String;
-endif;
+Replace_String = Format_String;
+Replace_Length = %len(%trimr(Format_String));
 
-// Récupération de la bibliothèque, du fichier et du membre source
+// Traitement de l'invite F4
+// if Prompt;
+  // On execute toujours la commande de QSYS */
+  // Format_String  = %subst(Format_String:1:2) + 'QSYS/' +
+                   // %subst(Format_String:3);
+// else;
+  // if %subst(Format_String:1:4) <> 'QSYS';
+    //On execute toujours la commande de QSYS */
+    // Format_String  = 'QSYS/' + Format_String;
+  // endif;
+// endif;
+
+//Récupération de la bibliothèque, du fichier et du membre source
 RTVMBRSRC(Format_String : P_Lib : P_Fil : P_Mbr);
-// Si *CURLIB
+//Si *CURLIB
 If P_Lib = '*CURLIB';
   EXEC SQL
        SELECT substr(name, 1, 10)
@@ -97,24 +102,24 @@ If P_Lib = '*CURLIB';
     P_Lib = 'QGPL'   ;
   EndIf;
 EndIf;
-// On va lire les balises des balises du langage GDDS
-// pour les ajouter à la commande recue
-//
-// Création d'un alias pour lecture du membre source de compile
+//On va lire les balises des balises du langage GDDS
+//pour les ajouter à la commande recue
+//Création d'un alias pour lecture du membre source de compile
 CmdSQL = 'DROP ALIAS QTEMP/INPUT';
 EXEC SQL
   EXECUTE IMMEDIATE :CmdSQL;
-// si *LIBL
+//si *LIBL
 If P_Lib = '*LIBL';
-  CmdSQL = 'CREATE ALIAS QTEMP/INPUT FOR ' + %trim(P_Fil) +  ' (' + %trim(P_Mbr) + ')';
+  CmdSQL = 'CREATE ALIAS QTEMP/INPUT FOR ' + %trim(P_Fil)
+  +  ' (' + %trim(P_Mbr) + ')';
 Else;
   CmdSQL = 'CREATE ALIAS QTEMP/INPUT FOR ' + %trim(P_Lib) + '/' +
            %trim(P_Fil) + ' (' + %trim(P_Mbr) + ')';
 EndIf;
 EXEC SQL
   EXECUTE IMMEDIATE :CmdSQL;
-// Lecture des lignes du membre source qui contiennent des options de compilation
-// du type <COMP>xxxxxxxxxxxxxx</COMP>
+//Lecture des lignes du membre source qui contiennent des options de compilation
+//du type <COMP>xxxxxxxxxxxxxx</COMP>
 EXEC SQL
   CLOSE curs01;
 
@@ -130,18 +135,21 @@ EXEC SQL
        AND SrcDta LIKE ('%</COMP>%');
 EXEC SQL
   OPEN curs01;
-// Boucle de lecture des options de compilation
+//Boucle de lecture des options de compilation
 DoU SqlCode <> 0;
   EXEC SQL
     FETCH FROM curs01 INTO :SrcDta;
   If SqlCode = 0;
-    Format_String = %trim(Format_String) + ' ' + %trim(SrcDta);
+    // On n'ajoute l'option que si elle n'est pas déjà présente dans la commande
+    If %scan(%trim(SrcDta) : Format_String) = 0;
+      Format_String = %trim(Format_String) + ' ' + %trim(SrcDta);
+    EndIf;
   EndIf;
 EndDo;
-// Restitution de la commande complétée des options du source
+//Restitution de la commande complétée des options du source
 Replace_String = Format_String;
 Replace_Length = %len(Replace_String);
-// Historisation des commandes traitées par GDDS
+//Historisation des commandes traitées par GDDS
 exec sql
  INSERT INTO LOGGDDS VALUES(current user, current date,
 current time, trim(:Replace_String)) ;
